@@ -129,3 +129,127 @@ $mailer->send($email);
     //Upload blob
     $blobClient->createBlockBlob($containerName, $fileToUpload, $content);
 ```
+## 8. Используется интеграция со службой доставки для расчета стоимости (например, PickPoint или Почта России)
+### sch-group/pickpoint
+```php
+$config = [
+ 'host' => '',
+ 'login' => '',
+ 'password' => '',
+ 'ikn' => '',
+];    
+
+$pickPointConf = new PickPointConf($config['host'], $config['login'], $config['password'], $config['ikn']);
+
+$defaultPackageSize = new PackageSize(20, 20,20); // может быть null
+
+$senderDestination = new SenderDestination('Москва', 'Московская обл.'); // Адрес отправителя
+
+$client = new PickPointConnector($pickPointConf, $senderDestination, $defaultPackageSize);
+ 
+ 
+Так же можно добавить кэширование, для ускорения запроса на авторизацию 
+$redisCacheConf = [
+ 'host' => '127.0.0.1',
+ 'port' => 6379
+];
+
+$client = new PickPointConnector($pickPointConf, $senderDestination, $defaultPackageSize, $redisCacheConf);
+```
+
+## 9. Используется интеграция с социальными сетями для авторизации пользователей.
+### hybridauth/hybridauth
+```php
+$config = [
+    'callback' => 'https://example.com/path/to/script.php',
+    'keys' => [
+        'key' => 'your-twitter-consumer-key',
+        'secret' => 'your-twitter-consumer-secret',
+    ],
+];
+
+try {
+    $twitter = new Hybridauth\Provider\Twitter($config);
+
+    $twitter->authenticate();
+
+    $accessToken = $twitter->getAccessToken();
+    $userProfile = $twitter->getUserProfile();
+    $apiResponse = $twitter->apiRequest('statuses/home_timeline.json');
+}
+catch (\Exception $e) {
+    echo 'Oops, we ran into an issue! ' . $e->getMessage();
+}
+```
+
+## 10. Данные о товарах регулярно отправляются в Яндекс.Маркет.
+### yandex-market/yandex-market-php-partner
+```php
+// Указываем авторизационные данные
+$clientId = '9876543210fedcbaabcdef0123456789';
+$token = '01234567-89ab-cdef-fedc-ba9876543210';
+
+// Создаем экземпляр клиента с базовыми методами
+$baseClient = new \Yandex\Market\Partner\Clients\BaseClient($clientId, $token);
+
+// Магазины возвращаются постранично
+$pageNumber = 0;
+do {
+    $pageNumber++;
+    
+    // Получаем страницу магазинов с номером pageNumber
+    $campaignsObject = $baseClient->getCampaigns(['page' => $pageNumber,]);
+    // Получаем итератор по магазинам на странице
+    $campaignsPage = $campaignsObject->getCampaigns();
+
+    // Получаем количество магазинов на странице
+    $campaignsCount = $campaignsPage->count();
+
+    // Получаем первый магазин
+    $campaign = $campaignsPage->current();
+    // Печатаем идентификатор и URL магазина, затем переходим к следующему    
+    for ($i = 0; $i < $campaignsCount; $i++) {
+        echo 'ID: ' . $campaign->getId();
+        echo 'Domain: ' . $campaign->getDomain();        
+        $campaign = $campaignsPage->next();
+    }
+    
+    // Получаем информацию о страницах. Возвращаемое количество страниц может увеличиваться 
+    // по мере увеличения номера страницы. Последняя страница будет достигнута, 
+    // когда вернется количество страниц, равное номеру текущей страницы    
+    $campaignsTotalPages = $campaignsObject->getPager()->getPagesCount();
+} while ($pageNumber != $campaignsTotalPages);    
+```
+## 11. Принимается онлайн-оплата от покупателей.
+### stripe/stripe-php
+```php
+    $stripe = new \Stripe\StripeClient('sk_test_BQokikJOvBiI2HlWgH4olfQ2');
+    $customer = $stripe->customers->create([
+        'description' => 'example customer',
+        'email' => 'email@example.com',
+        'payment_method' => 'pm_card_visa',
+    ]);
+    echo $customer;
+```
+## 12. Применяются средства тестирования (например, PHPUnit).
+### phpunit/phpunit
+```php
+<?php declare(strict_types=1);
+use PHPUnit\Framework\TestCase;
+
+final class StackTest extends TestCase
+{
+    public function testPushAndPop(): void
+    {
+        $stack = [];
+        $this->assertSame(0, count($stack));
+
+        array_push($stack, 'foo');
+        $this->assertSame('foo', $stack[count($stack)-1]);
+        $this->assertSame(1, count($stack));
+
+        $this->assertSame('foo', array_pop($stack));
+        $this->assertSame(0, count($stack));
+    }
+}
+```
