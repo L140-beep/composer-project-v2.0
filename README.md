@@ -156,7 +156,42 @@ $redisCacheConf = [
 
 $client = new PickPointConnector($pickPointConf, $senderDestination, $defaultPackageSize, $redisCacheConf);
 ```
+### lapaygroup/russianpost
+```php
+<?php
+try {
+  $objectId = 2020; // Письмо с объявленной ценностью
+  // Минимальный набор параметров для расчета стоимости отправления
+  $params = [
+              'weight' => 20, // Вес в граммах
+              'sumoc' => 10000, // Сумма объявленной ценности в копейках
+              'from' => 109012 // Почтовый индекс места отправления
+              ];
 
+  // Список ID дополнительных услуг 
+  // 2 - Заказное уведомление о вручении 
+  // 21 - СМС-уведомление о вручении
+  $services = [2,21];
+
+  $TariffCalculation = new \LapayGroup\RussianPost\TariffCalculation();
+  $calcInfo = $TariffCalculation->calculate($objectId, $params, $services);
+}
+
+catch (\LapayGroup\RussianPost\Exceptions\RussianPostTarrificatorException $e) {
+    // Обработка ошибок тарификатора 
+    $errors = $e->getErrors(); // Массив вида [['msg' => 'текст ошибки', 'code' => код ошибки]]
+}
+
+catch (\LapayGroup\RussianPost\Exceptions\RussianPostException $e) {
+    // Обработка ошибочного ответа от API ПРФ
+}
+
+catch (\Exception $e) {
+    // Обработка нештатной ситуации
+}
+
+?>
+```
 ## 9. Используется интеграция с социальными сетями для авторизации пользователей.
 ### hybridauth/hybridauth
 ```php
