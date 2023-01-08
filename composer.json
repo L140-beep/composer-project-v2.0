@@ -1,0 +1,18 @@
+{
+    "require": {
+        "doctrine/dbal": "^3.5",
+        "laragear/cache-query": "^3.0",
+        "phpoffice/phpspreadsheet": "^1.26",
+        "tecnickcom/tcpdf": "^6.6",
+        "twilio/sdk": "^6.44",
+        "symfony/mailer": "^6.2",
+        "microsoft/azure-storage-common": "^1.5",
+        "sch-group/pickpoint": "^4.2",
+        "hybridauth/hybridauth": "^3.8",
+        "yandex-market/yandex-market-php-partner": "^2.4",
+        "stripe/stripe-php": "^10.3"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5"
+    }
+}
